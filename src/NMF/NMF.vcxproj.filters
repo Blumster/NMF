@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="api">
+      <UniqueIdentifier>{62c14594-4e99-49fe-aec3-13aa60b6152d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="api\memory">
+      <UniqueIdentifier>{40831951-7ad7-4e9e-99fe-f91fd3fef00f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="api\win32">
+      <UniqueIdentifier>{3e12db79-9afe-451a-8e02-5b8038ca1a01}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NMF.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="export.h" />
+    <ClInclude Include="api\memory\addressing.h">
+      <Filter>api\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="api\memory\functions.h">
+      <Filter>api\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="api\memory\global.h">
+      <Filter>api\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="api\memory\hook.h">
+      <Filter>api\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="api\memory\patch.h">
+      <Filter>api\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="api\win32\rtti.h">
+      <Filter>api\win32</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="NMF.cpp" />
+    <ClCompile Include="api\memory\addressing.cpp">
+      <Filter>api\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="api\memory\hook.cpp">
+      <Filter>api\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="api\memory\patch.cpp">
+      <Filter>api\memory</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
