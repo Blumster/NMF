@@ -13,8 +13,13 @@ namespace NMF
     {
         WndProcHandleResult result = WndProcHandleResult::Continue;
 
+#ifdef NMF_USE_IMGUI
         HANDLE_MODULE_WNDPROC(ImGuiManager::WndProc);
+#endif
+
+#ifdef NMF_USE_MODDING
         HANDLE_MODULE_WNDPROC(ModManagerBase::Instance->WndProc);
+#endif
 
         return result;
     }
