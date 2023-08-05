@@ -9,11 +9,11 @@
 #pragma comment(lib, "psapi.lib")
 
 #if defined(_WIN64)
-#pragma comment(lib, "lib/detours/x64/detours.lib")
-#pragma comment(lib, "lib/detours/x64/syelog.lib")
+#pragma comment(lib, __FILE__ "/../lib/detours/x64/detours.lib")
+#pragma comment(lib, __FILE__ "/../lib/detours/x64/syelog.lib")
 #elif defined(_WIN32)
-#pragma comment(lib, "lib/detours/x86/detours.lib")
-#pragma comment(lib, "lib/detours/x86/syelog.lib")
+#pragma comment(lib, __FILE__ "/../lib/detours/x86/detours.lib")
+#pragma comment(lib, __FILE__ "/../lib/detours/x86/syelog.lib")
 #else
 #error "Invalid Architecture!"
 #endif
