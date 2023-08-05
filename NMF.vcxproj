@@ -32,6 +32,7 @@
     <ClCompile Include="NMF_ImGui.cpp" />
     <ClCompile Include="NMF_Logging.cpp" />
     <ClCompile Include="NMF_Memory.cpp" />
+    <ClCompile Include="NMF_Modding.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
