@@ -282,7 +282,7 @@ namespace NMF
     {
         friend class MemoryManager;
 
-        Patch(void* gameAddress, void* data, size_t size);
+        Patch(void* gameAddress, const void* data, size_t size);
         ~Patch();
 
     public:
@@ -312,8 +312,10 @@ namespace NMF
 
         static Hook* CreateHook(void* gameAddress, void* hookFunc);
         static Hook* CreateAndApplyHook(void* gameAddress, void* hookFunc);
-        static Patch* CreatePatch(void* gameAddress, void* data, size_t size);
-        static Patch* CreateAndApplyPatch(void* gameAddress, void* data, size_t size);
+        static Patch* CreatePatch(void* gameAddress, const void* data, size_t size);
+        static Patch* CreatePatch(void* gameAddress, std::initializer_list<uint8_t> data);
+        static Patch* CreateAndApplyPatch(void* gameAddress, const void* data, size_t size);
+        static Patch* CreateAndApplyPatch(void* gameAddress, std::initializer_list<uint8_t> data);
         static Patch* NopMemory(void* gameAddress, size_t size);
 
     private:
@@ -322,7 +324,7 @@ namespace NMF
 #endif
 
 #pragma warning(disable: 4251)
-        static std::map<uint32_t, Hook*> Hooks;
+        static std::map<uint64_t, Hook*> Hooks;
         static std::vector<Patch*> Patches;
 #pragma warning(default: 4251)
     };

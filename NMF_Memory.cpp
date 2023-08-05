@@ -146,7 +146,7 @@ namespace NMF
         return true;
     }
 
-    Patch::Patch(void* gameAddress, void* data, size_t size)
+    Patch::Patch(void* gameAddress, const void* data, size_t size)
         : Address(gameAddress), OriginalData(nullptr), Size(size)
     {
         Data = new uint8_t[Size];
@@ -212,7 +212,7 @@ namespace NMF
 #pragma endregion
 
 #pragma region Memory Manager
-    std::map<uint32_t, Hook*> MemoryManager::Hooks;
+    std::map<uint64_t, Hook*> MemoryManager::Hooks;
     std::vector<Patch*>       MemoryManager::Patches;
 
 #ifdef NMF_USE_LOGGING
@@ -256,7 +256,7 @@ namespace NMF
 
     Hook* MemoryManager::CreateHook(void* gameAddress, void* hookFunc)
     {
-        uint32_t hookId = (uint32_t)gameAddress;
+        uint64_t hookId = reinterpret_cast<uint64_t>(gameAddress);
 
 #ifdef NMF_USE_LOGGING
         Logger.Log(LogSeverity::Debug, "Creating hook of 0x%lX, replacing with 0x%lX", hookId, hookFunc);
@@ -288,9 +288,9 @@ namespace NMF
         return hook;
     }
 
-    Patch* MemoryManager::CreatePatch(void* gameAddress, void* data, size_t size)
+    Patch* MemoryManager::CreatePatch(void* gameAddress, const void* data, size_t size)
     {
-        uint32_t patchAddr = (uint32_t)gameAddress;
+        uint64_t patchAddr = reinterpret_cast<uint64_t>(gameAddress);
 
 #ifdef NMF_USE_LOGGING
         Logger.Log(LogSeverity::Debug, "Creating patch of size %lu at 0x%lX", size, patchAddr);
@@ -298,7 +298,7 @@ namespace NMF
 
         for (const auto& patch : Patches)
         {
-            uint32_t currPatchAddr = (uint32_t)patch->Address;
+            uint64_t currPatchAddr = reinterpret_cast<uint64_t>(patch->Address);
 
             if (patchAddr + size > currPatchAddr && patchAddr < currPatchAddr + patch->Size)
             {
@@ -317,13 +317,23 @@ namespace NMF
         return patch;
     }
 
-    Patch* MemoryManager::CreateAndApplyPatch(void* gameAddress, void* data, size_t size)
+    Patch* MemoryManager::CreatePatch(void* gameAddress, std::initializer_list<uint8_t> data)
+    {
+        return CreatePatch(gameAddress, data.begin(), data.size());
+    }
+
+    Patch* MemoryManager::CreateAndApplyPatch(void* gameAddress, const void* data, size_t size)
     {
         auto patch = MemoryManager::CreatePatch(gameAddress, data, size);
         if (patch)
             patch->Apply();
 
         return patch;
+    }
+
+    Patch* MemoryManager::CreateAndApplyPatch(void* gameAddress, std::initializer_list<uint8_t> data)
+    {
+        return CreateAndApplyPatch(gameAddress, data.begin(), data.size());
     }
 
     Patch* MemoryManager::NopMemory(void* gameAddress, size_t size)

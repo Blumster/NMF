@@ -1,7 +1,6 @@
 #ifdef NMF_USE_IMGUI
 #include "NMF.h"
 
-#include "lib/imgui/imgui.h"
 #include "lib/imgui/backends/imgui_impl_win32.h"
 
 #if defined(NMF_IMGUI_DX9)
@@ -287,6 +286,9 @@ namespace NMF
                 ModManagerBase::Instance->OnDebugImGuiDraw(ImGuiDrawTarget::MainMenu);
 #endif
 
+            for (const auto& console : Consoles)
+                RenderConsole(ImGuiDrawTarget::MainMenu, console.second);
+
 #ifdef NMF_IMGUI_DEMO
             if (ImGui::MenuItem("ImGui demo"))
                 IsImGUIDemoOpen = !IsImGUIDemoOpen;
@@ -332,6 +334,9 @@ namespace NMF
         if (ModManagerBase::Instance != nullptr)
             ModManagerBase::Instance->OnDebugImGuiDraw(ImGuiDrawTarget::General);
 #endif
+
+        for (const auto& console : Consoles)
+            RenderConsole(ImGuiDrawTarget::General, console.second);
 
 #ifdef NMF_IMGUI_DEMO
         if (IsImGUIDemoOpen)
@@ -496,7 +501,7 @@ namespace NMF
             return false;
         }
 
-        HRESULT result = -1;
+        HRESULT result = E_FAIL;
 
 #if defined(NMF_IMGUI_DX9)
         D3DPRESENT_PARAMETERS D3DPP;
@@ -528,6 +533,181 @@ namespace NMF
         return true;
     }
 #endif
+
+    bool ImGuiManager::AddConsole(const char* id, const char* name, ConsoleSendFunction sendFunction)
+    {
+        std::string consoleId{ id };
+
+        auto itr = Consoles.find(consoleId);
+        if (itr != Consoles.end())
+            return false;
+
+        auto console = new ImGuiConsole();
+        console->Id = id;
+        console->Name = name;
+        console->SendFunction = sendFunction;
+
+        Consoles[consoleId] = console;
+
+        return true;
+    }
+
+    bool ImGuiManager::RemoveConsole(const char* id)
+    {
+        std::string consoleId{ id };
+        
+        auto itr = Consoles.find(consoleId);
+        if (itr != Consoles.end())
+        {
+            delete itr->second;
+
+            Consoles.erase(itr);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool ImGuiManager::AddMessage(const char* id, const std::string& message)
+    {
+        return AddMessage(id, message, ImGui::GetStyleColorVec4(ImGuiCol_Text));
+    }
+
+    bool ImGuiManager::AddMessage(const char* id, const std::string& message, const ImVec4& color)
+    {
+        std::string consoleId { id };
+
+        auto itr = Consoles.find(consoleId);
+        if (itr == Consoles.end())
+            return false;
+
+        const std::lock_guard<std::mutex> lock(itr->second->EntriesLock);
+
+        itr->second->Entries.push_back(ImGuiConsoleEntry{ color, message });
+
+        return true;
+    }
+
+    int HandleConsoleCallback(ImGuiInputTextCallbackData* data)
+    {
+        ImGuiConsole* console = static_cast<ImGuiConsole*>(data->UserData);
+
+        switch (data->EventFlag)
+        {
+        case ImGuiInputTextFlags_CallbackHistory:
+            int prev_history_pos = console->HistoryIndex;
+
+            if (data->EventKey == ImGuiKey_UpArrow)
+            {
+                if (console->HistoryIndex == -1)
+                    console->HistoryIndex = static_cast<int>(console->History.size()) - 1;
+                else if (console->HistoryIndex > 0)
+                    console->HistoryIndex--;
+            }
+            else if (data->EventKey == ImGuiKey_DownArrow)
+            {
+                if (console->HistoryIndex != -1)
+                {
+                    if (++console->HistoryIndex >= static_cast<int>(console->History.size()))
+                        console->HistoryIndex = -1;
+                }
+            }
+
+            if (prev_history_pos != console->HistoryIndex)
+            {
+                data->DeleteChars(0, data->BufTextLen);
+
+                if (console->HistoryIndex >= 0)
+                {
+                    const std::string& history_str = console->History[console->HistoryIndex];
+
+                    data->InsertChars(0, history_str.c_str());
+                }
+            }
+            break;
+        }
+
+        return 0;
+    }
+
+    void ImGuiManager::RenderConsole(ImGuiDrawTarget target, ImGuiConsole* console)
+    {
+        static float sendButtonWidth = 40.0f;
+
+        if (target == ImGuiDrawTarget::MainMenu)
+        {
+            if (ImGui::MenuItem(console->Name))
+                console->IsShown = !console->IsShown;
+
+            return;
+        }
+
+        if (target != ImGuiDrawTarget::General)
+            return;
+
+        if (!console->IsShown)
+            return;
+
+        ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
+        ImGui::Begin(console->Name, &console->IsShown);
+
+        const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+        ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
+
+        {
+            const std::lock_guard<std::mutex> lock(console->EntriesLock);
+
+            for (const auto& entry : console->Entries)
+                ImGui::TextColored(entry.Color, entry.Message.c_str());
+
+            if (console->LastEntryCount < console->Entries.size())
+            {
+                ImGui::SetScrollHereY(1.0f);
+
+                console->LastEntryCount = console->Entries.size();
+            }
+        }
+
+        ImGui::PopStyleVar();
+        ImGui::EndChild();
+
+        if (console->SendFunction)
+        {
+            ImGui::BeginChild("CommandRegion");
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionMax().x - sendButtonWidth - ImGui::GetStyle().ItemSpacing.x);
+
+            if (ImGui::InputText("##consoleInput", console->TextInput, 512, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory, HandleConsoleCallback, console))
+            {
+                ImGui::SetKeyboardFocusHere(-1);
+
+                HandleCommand(console);
+            }
+
+            ImGui::PopItemWidth();
+            ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - sendButtonWidth);
+
+            if (ImGui::Button("Send", ImVec2(sendButtonWidth, 19.0f)))
+                HandleCommand(console);
+
+            ImGui::EndChild();
+        }
+        
+        ImGui::End();
+    }
+
+    void ImGuiManager::HandleCommand(ImGuiConsole* console)
+    {
+        if (strlen(console->TextInput) == 0)
+            return;
+
+        console->History.push_back(console->TextInput);
+
+        console->SendFunction(console->TextInput);
+
+        console->TextInput[0] = 0;
+    }
 }
 
 #endif

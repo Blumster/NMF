@@ -34,4 +34,8 @@ namespace NMF
     }
 }
 
+extern "C" __declspec(dllexport) void NMF_dummy_detours_export()
+{
+}
+
 #undef HANDLE_MODULE_WNDPROC

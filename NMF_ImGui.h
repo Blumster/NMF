@@ -2,11 +2,18 @@
 
 #ifdef NMF_USE_IMGUI
 
+#include <functional>
+#include <map>
+#include <mutex>
 #include <stdint.h>
+#include <string>
 
 #ifndef NMF_VERSION
 #include "NMF.h"
 #endif
+
+// TODO: imconfig.h ?
+#include "lib/imgui/imgui.h"
 
 #if defined(NMF_IMGUI_DX9)
 struct IDirect3D9;
@@ -29,6 +36,42 @@ namespace NMF
         General
     };
 
+    struct ImGuiConsoleEntry
+    {
+        ImVec4 Color;
+        std::string Message;
+    };
+
+    using ConsoleSendFunction = std::function<void(const char*)>;
+
+    struct ImGuiConsole
+    {
+        ImGuiConsole()
+            : Id(nullptr)
+            , Name(nullptr)
+            , TextInput("")
+            , LastEntryCount(0)
+            , HistoryIndex(-1)
+            , IsShown(false)
+            , SendFunction()
+            , Entries()
+            , History()
+            , EntriesLock()
+        {
+        }
+
+        const char* Id;
+        const char* Name;
+        char TextInput[512];
+        size_t LastEntryCount;
+        int HistoryIndex;
+        bool IsShown;
+        ConsoleSendFunction SendFunction;
+        std::vector<ImGuiConsoleEntry> Entries;
+        std::vector<std::string> History;
+        std::mutex EntriesLock;
+    };
+
     class NMF_EXPORT ImGuiManager final
     {
     public:
@@ -40,16 +83,28 @@ namespace NMF
         static bool IsMenuShown();
         static void EndScene();
 
+        static bool AddConsole(const char* id, const char* name, ConsoleSendFunction sendFunction);
+        static bool RemoveConsole(const char* id);
+        static bool AddMessage(const char* id, const std::string& message);
+        static bool AddMessage(const char* id, const std::string& message, const ImVec4& color);
+
     private:
         static void RecreateContext();
+
+        static void RenderConsole(ImGuiDrawTarget target, ImGuiConsole* console);
+        static void HandleCommand(ImGuiConsole* console);
 
         static bool IsMenuOpen;
         static HWND GameHWND;
         static HINSTANCE GameHINSTANCE;
         static int GamenShowCmd;
 
+#pragma warning(disable: 4251)
+        static std::map<std::string, ImGuiConsole*> Consoles;
+#pragma warning(default: 4251)
+
 #ifdef NMF_IMGUI_POP_OUT
-        static LRESULT CALLBACK ExternalWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+        static LRESULT WINAPI ExternalWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
         static bool RegisterExternalWindow();
         static bool CreateExternalWindow();
