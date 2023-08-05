@@ -8,22 +8,22 @@
 
 #pragma comment(lib, "psapi.lib")
 
-#if defined(NMF_X86)
-#pragma comment(lib, "lib/detours/x86/detours.lib")
-#pragma comment(lib, "lib/detours/x86/syelog.lib")
-#elif defined(NMF_X64)
+#if defined(_WIN64)
 #pragma comment(lib, "lib/detours/x64/detours.lib")
 #pragma comment(lib, "lib/detours/x64/syelog.lib")
+#elif defined(_WIN32)
+#pragma comment(lib, "lib/detours/x86/detours.lib")
+#pragma comment(lib, "lib/detours/x86/syelog.lib")
 #else
 #error "Invalid Architecture!"
 #endif
 
 #if defined(NMF_STATIC_BASE)
 constexpr uint64_t StaticImageBase = NMF_STATIC_BASE;
-#elif defined(NMF_X86)
+#elif defined(_WIN64)
+constexpr uint64_t StaticImageBase = 0x140000000ull; 
+#elif defined(_WIN32)
 constexpr uint64_t StaticImageBase = 0x400000ull;
-#elif defined(NMF_X64)
-constexpr uint64_t StaticImageBase = 0x140000000ull;
 #else
 #error "Invalid Architecture!"
 #endif
