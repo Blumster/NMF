@@ -8,9 +8,5 @@
 
 namespace NMF
 {
-    enum class ImGuiDrawTarget : uint8_t
-    {
-        MainMenu,
-        General
-    };
+
 }

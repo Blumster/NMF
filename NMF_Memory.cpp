@@ -210,6 +210,136 @@ namespace NMF
         return true;
     }
 #pragma endregion
+
+#pragma region Memory Manager
+    std::map<uint32_t, Hook*> MemoryManager::Hooks;
+    std::vector<Patch*>       MemoryManager::Patches;
+
+#ifdef NMF_USE_LOGGING
+    Logger                    MemoryManager::Logger{ "MemoryManager" };
+#endif
+
+    void MemoryManager::Setup()
+    {
+#ifdef NMF_USE_LOGGING
+        Logger.Log(LogSeverity::Debug, "MemoryManager has been set up!");
+#endif
+    }
+
+    void MemoryManager::Teardown()
+    {
+#ifdef NMF_USE_LOGGING
+        Logger.Log(LogSeverity::Debug, "Tearing down MemoryManager...");
+#endif
+
+        for (const auto& hook : Hooks)
+        {
+            hook.second->Remove();
+
+            delete hook.second;
+        }
+
+        for (const auto& patch : Patches)
+        {
+            patch->Remove();
+
+            delete patch;
+        }
+
+        Hooks.clear();
+        Patches.clear();
+
+#ifdef NMF_USE_LOGGING
+        Logger.Log(LogSeverity::Debug, "MemoryManager has been torn down!");
+#endif
+    }
+
+    Hook* MemoryManager::CreateHook(void* gameAddress, void* hookFunc)
+    {
+        uint32_t hookId = (uint32_t)gameAddress;
+
+#ifdef NMF_USE_LOGGING
+        Logger.Log(LogSeverity::Debug, "Creating hook of 0x%lX, replacing with 0x%lX", hookId, hookFunc);
+#endif
+
+        auto itr = Hooks.find(hookId);
+        if (itr != Hooks.end())
+        {
+#ifdef NMF_USE_LOGGING
+            Logger.Log(LogSeverity::Warning, "Hook of 0x%lX already exists! Skipping...", hookId);
+#endif
+
+            return nullptr;
+        }
+
+        auto hook = new Hook(gameAddress, hookFunc);
+
+        Hooks[hookId] = hook;
+
+        return hook;
+    }
+
+    Hook* MemoryManager::CreateAndApplyHook(void* gameAddress, void* hookFunc)
+    {
+        auto hook = MemoryManager::CreateHook(gameAddress, hookFunc);
+        if (hook)
+            hook->Apply();
+
+        return hook;
+    }
+
+    Patch* MemoryManager::CreatePatch(void* gameAddress, void* data, size_t size)
+    {
+        uint32_t patchAddr = (uint32_t)gameAddress;
+
+#ifdef NMF_USE_LOGGING
+        Logger.Log(LogSeverity::Debug, "Creating patch of size %lu at 0x%lX", size, patchAddr);
+#endif
+
+        for (const auto& patch : Patches)
+        {
+            uint32_t currPatchAddr = (uint32_t)patch->Address;
+
+            if (patchAddr + size > currPatchAddr && patchAddr < currPatchAddr + patch->Size)
+            {
+#ifdef NMF_USE_LOGGING
+                Logger.Log(LogSeverity::Warning, "Patch at 0x%lX size %lu overlaps with patch at 0x%lX size %lu! Skipping...", patchAddr, size, currPatchAddr, patch->Size);
+#endif
+
+                return nullptr;
+            }
+        }
+
+        auto patch = new Patch(gameAddress, data, size);
+
+        Patches.push_back(patch);
+
+        return patch;
+    }
+
+    Patch* MemoryManager::CreateAndApplyPatch(void* gameAddress, void* data, size_t size)
+    {
+        auto patch = MemoryManager::CreatePatch(gameAddress, data, size);
+        if (patch)
+            patch->Apply();
+
+        return patch;
+    }
+
+    Patch* MemoryManager::NopMemory(void* gameAddress, size_t size)
+    {
+        auto nopArray = new unsigned char[size];
+
+        for (size_t i = 0; i < size; ++i)
+            nopArray[i] = 0x90;
+
+        auto patch = MemoryManager::CreatePatch(gameAddress, nopArray, size);
+        if (patch)
+            patch->Apply();
+
+        return patch;
+    }
+#pragma endregion
 }
 
 #undef TXT_

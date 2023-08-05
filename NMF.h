@@ -26,11 +26,50 @@
     type& operator=(const type&) = delete; \
     type& operator=(type&&) = delete;
 
+namespace NMF
+{
+    enum class NMFExitCode : int32_t
+    {
+        ImGuiManagerRegisterExternalWindow = 10,
+        ImGuiManagerCreateExternalWindow   = 11,
+        ImGuiManagerInvalidImGUIVersion    = 12,
+        ImGuiManagerDeviceHooks            = 13,
+    };
+
+    enum class WndProcHandleResult : uint8_t
+    {
+        Continue,
+        Handled,
+        Default
+    };
+
+    WndProcHandleResult NMFWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    //NMF_EXPORT SDKError SetupSDK();
+    //NMF_EXPORT SDKError TeardownSDK();
+    //NMF_EXPORT GameTypes GetGameType();
+    //NMF_EXPORT bool HostIsGame();
+
+    NMF_EXPORT void NMFRestoreImportTable();
+    NMF_EXPORT void NMFExit(NMFExitCode exitCode);
+}
+
+#ifdef NMF_USE_LOGGING
+#include "NMF_Logging.h"
+#endif
 
 #include "NMF_Memory.h"
 
 #ifdef NMF_USE_IMGUI
-#include "NMF_UI.h"
+#include "NMF_ImGui.h"
+#endif
+
+#ifdef NMF_USE_EXT_LUA
+#include "NMF_Lua.h"
+#endif
+
+#ifdef NMF_USE_MODDING
+#include "NMF_Modding.h"
 #endif
 
 #ifdef NMF_USE_RTTI
@@ -39,20 +78,3 @@
 
 #undef NMF_DELETE_ALL_INIT
 #undef NMF_DELETE_INIT
-
-namespace NMF
-{
-    enum class WndProcHandleResult : uint8_t
-    {
-        Continue,
-        Handled,
-        Default
-    };
-
-    //NMF_EXPORT SDKError SetupSDK();
-    //NMF_EXPORT SDKError TeardownSDK();
-    //NMF_EXPORT GameTypes GetGameType();
-    //NMF_EXPORT bool HostIsGame();
-    //NMF_EXPORT void RestoreImportTable();
-    //NMF_EXPORT void SDKExit(int exitCode);
-}

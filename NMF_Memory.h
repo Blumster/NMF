@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <stdint.h>
+#include <vector>
 
 #ifndef NMF_VERSION
 #include "NMF.h"
@@ -8,6 +10,8 @@
 
 namespace NMF
 {
+    class MemoryManager;
+
     NMF_EXTENDED_EXPORT void* operator"" _addr(uint64_t address);
     NMF_EXTENDED_EXPORT void* operator"" _rva(uint64_t address);
 
@@ -40,7 +44,7 @@ namespace NMF
     };
 
     template<typename RetType, typename... Args>
-    class ThisGameFunction
+    class ThisGameFunction 
     {
     public:
         using FuncType = RetType(__thiscall*)(Args...);
@@ -296,6 +300,31 @@ namespace NMF
         void* Data;
         void* OriginalData;
         size_t Size;
+    };
+#pragma endregion
+
+#pragma region MemoryManager
+    class NMF_EXPORT MemoryManager final
+    {
+    public:
+        static void Setup();
+        static void Teardown();
+
+        static Hook* CreateHook(void* gameAddress, void* hookFunc);
+        static Hook* CreateAndApplyHook(void* gameAddress, void* hookFunc);
+        static Patch* CreatePatch(void* gameAddress, void* data, size_t size);
+        static Patch* CreateAndApplyPatch(void* gameAddress, void* data, size_t size);
+        static Patch* NopMemory(void* gameAddress, size_t size);
+
+    private:
+#ifdef NMF_USE_LOGGING
+        static Logger Logger;
+#endif
+
+#pragma warning(disable: 4251)
+        static std::map<uint32_t, Hook*> Hooks;
+        static std::vector<Patch*> Patches;
+#pragma warning(default: 4251)
     };
 #pragma endregion
 }

@@ -4,9 +4,15 @@
     <ClInclude Include="NMF.h" />
     <ClInclude Include="NMF_Memory.h" />
     <ClInclude Include="NMF_RTTI.h" />
+    <ClInclude Include="NMF_Logging.h" />
+    <ClInclude Include="NMF_Modding.h" />
+    <ClInclude Include="NMF_Lua.h" />
+    <ClInclude Include="NMF_ImGui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NMF.cpp" />
     <ClCompile Include="NMF_Memory.cpp" />
+    <ClCompile Include="NMF_Logging.cpp" />
+    <ClCompile Include="NMF_ImGui.cpp" />
   </ItemGroup>
 </Project>
