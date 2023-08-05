@@ -24,6 +24,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace NMF
 {
+    std::map<std::string, ImGuiConsole*> ImGuiManager::Consoles;
+
     bool ImGuiManager::IsMenuOpen{ false };
     HWND ImGuiManager::GameHWND{ nullptr };
     HINSTANCE ImGuiManager::GameHINSTANCE{ nullptr };
