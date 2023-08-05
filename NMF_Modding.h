@@ -119,7 +119,7 @@ namespace NMF
     class ModManagerBase
     {
     public:
-        static ModManagerBase* Instance;
+        NMF_EXPORT static ModManagerBase* Instance;
 
         ModManagerBase()
         {
