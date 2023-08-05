@@ -127,7 +127,9 @@ namespace NMF
 
         if (DeviceEndSceneHook == nullptr || DeviceResetHook == nullptr)
         {
+#ifdef NMF_USE_LOGGING
             Logger.Log(LogSeverity::Error, "ImGuiManager: unable to hook EndScene/Reset! Exiting...");
+#endif
 
             NMFExit(NMFExitCode::ImGuiManagerDeviceHooks);
         }
