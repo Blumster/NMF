@@ -5,6 +5,10 @@
 
 #define NMF_VERSION "0.1"
 
+#ifdef NMF_USER_CONFIG
+#include NMF_USER_CONFIG
+#endif
+
 #ifndef NMF_EXPORT
 #define NMF_EXPORT
 #endif
