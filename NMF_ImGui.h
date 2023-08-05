@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef NMF_VERSION
+#include "NMF.h"
+#endif
+
 #ifdef NMF_USE_IMGUI
 
 #include <functional>
@@ -7,10 +11,6 @@
 #include <mutex>
 #include <stdint.h>
 #include <string>
-
-#ifndef NMF_VERSION
-#include "NMF.h"
-#endif
 
 // TODO: imconfig.h ?
 #include "lib/imgui/imgui.h"

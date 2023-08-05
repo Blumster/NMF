@@ -1,5 +1,6 @@
-#ifdef NMF_USE_IMGUI
 #include "NMF.h"
+
+#ifdef NMF_USE_IMGUI
 
 #include "lib/imgui/backends/imgui_impl_win32.h"
 

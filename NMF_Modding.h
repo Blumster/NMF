@@ -1,14 +1,14 @@
 #pragma once
 
+#ifndef NMF_VERSION
+#include "NMF.h"
+#endif
+
 #ifdef NMF_USE_MODDING
 
 #include <map>
 #include <stdint.h>
 #include <string>
-
-#ifndef NMF_VERSION
-#include "NMF.h"
-#endif
 
 namespace NMF
 {

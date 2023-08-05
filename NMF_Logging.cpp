@@ -1,3 +1,5 @@
+#include "NMF.h"
+
 #ifdef NMF_USE_LOGGING
 
 #include <chrono>
@@ -7,8 +9,6 @@
 #include <fstream>
 #include <sstream>
 #include <Windows.h>
-
-#include "NMF.h"
 
 namespace NMF
 {
