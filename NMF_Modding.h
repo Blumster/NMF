@@ -87,7 +87,7 @@ namespace NMF
         virtual bool RegisterModule(ModuleBase* module)
         {
 #ifdef NMF_USE_LOGGING
-            Logger.Log(LogSeverity::Debug, "Registering module: %s in mod: %s!", module->GetName(), GetName());
+            BaseLogger.Log(LogSeverity::Debug, "Registering module: %s in mod: %s!", module->GetName(), GetName());
 #endif
 
             std::string moduleName(module->GetName());
@@ -96,7 +96,7 @@ namespace NMF
             if (itr != Modules.end())
             {
 #ifdef NMF_USE_LOGGING
-                Logger.Log(LogSeverity::Error, "A module under the name %s has already been registered! Skipping...", module->GetName());
+                BaseLogger.Log(LogSeverity::Error, "A module under the name %s has already been registered! Skipping...", module->GetName());
 #endif
 
                 return false;
@@ -105,7 +105,7 @@ namespace NMF
             Modules[moduleName] = module;
 
 #ifdef NMF_USE_LOGGING
-            Logger.Log(LogSeverity::Debug, "Module: %s in mod: %s has been successfully registered!", module->GetName(), GetName());
+            BaseLogger.Log(LogSeverity::Debug, "Module: %s in mod: %s has been successfully registered!", module->GetName(), GetName());
 #endif
 
             return true;
@@ -126,7 +126,7 @@ namespace NMF
         const char* ModName;
 
 #ifdef NMF_USE_LOGGING
-        static Logger Logger;
+        static Logger BaseLogger;
 #endif
 
 #pragma warning(disable: 4251)
@@ -150,7 +150,7 @@ namespace NMF
         virtual bool RegisterMod(ModBase* mod)
         {
 #ifdef NMF_USE_LOGGING
-            Logger.Log(LogSeverity::Debug, "Registering mod: %s...", mod->GetName());
+            BaseLogger.Log(LogSeverity::Debug, "Registering mod: %s...", mod->GetName());
 #endif
 
             std::string modName(mod->GetName());
@@ -159,7 +159,7 @@ namespace NMF
             if (itr != Mods.end())
             {
 #ifdef NMF_USE_LOGGING
-                Logger.Log(LogSeverity::Error, "A mod under the name %s has already been registered! Skipping...", mod->GetName());
+                BaseLogger.Log(LogSeverity::Error, "A mod under the name %s has already been registered! Skipping...", mod->GetName());
 #endif
 
                 return false;
@@ -168,7 +168,7 @@ namespace NMF
             Mods[modName] = mod;
 
 #ifdef NMF_USE_LOGGING
-            Logger.Log(LogSeverity::Debug, "Mod: %s has been succesfully registered!", mod->GetName());
+            BaseLogger.Log(LogSeverity::Debug, "Mod: %s has been succesfully registered!", mod->GetName());
 #endif
 
             mod->OnAttach();
@@ -224,7 +224,7 @@ namespace NMF
 
     private:
 #ifdef NMF_USE_LOGGING
-        static Logger Logger;
+        static Logger BaseLogger;
 #endif
 
 #pragma warning(disable: 4251)
