@@ -34,9 +34,11 @@ namespace NMF
 {
     enum class NMFExitCode : int32_t
     {
+#ifdef NMF_IMGUI_POP_OUT
         ImGuiManagerRegisterExternalWindow = 10,
         ImGuiManagerCreateExternalWindow   = 11,
-        ImGuiManagerInvalidImGUIVersion    = 12,
+#endif
+        ImGuiManagerInvalidImGuiVersion    = 12,
         ImGuiManagerDeviceHooks            = 13,
     };
 

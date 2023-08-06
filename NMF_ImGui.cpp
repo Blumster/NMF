@@ -72,6 +72,7 @@ namespace NMF
         Logger.Log(LogSeverity::Debug, "Setting up ImGuiManager...");
 #endif
 
+#ifdef NMF_IMGUI_POP_OUT
         if (!RegisterExternalWindow())
         {
 #ifdef NMF_USE_LOGGING
@@ -91,6 +92,7 @@ namespace NMF
             NMFExit(NMFExitCode::ImGuiManagerCreateExternalWindow);
             return;
         }
+#endif
 
         if (!IMGUI_CHECKVERSION())
         {
@@ -98,7 +100,7 @@ namespace NMF
             Logger.Log(LogSeverity::Debug, "Invalid ImGUI version!");
 #endif
 
-            NMFExit(NMFExitCode::ImGuiManagerInvalidImGUIVersion);
+            NMFExit(NMFExitCode::ImGuiManagerInvalidImGuiVersion);
             return;
         }
 
@@ -290,7 +292,7 @@ namespace NMF
 
 #ifdef NMF_USE_MODDING
             if (ModManagerBase::Instance != nullptr)
-                ModManagerBase::Instance->OnDebugImGuiDraw(ImGuiDrawTarget::MainMenu);
+                ModManagerBase::Instance->OnImGuiDraw(ImGuiDrawTarget::MainMenu);
 #endif
 
             for (const auto& console : Consoles)
@@ -339,7 +341,7 @@ namespace NMF
 
 #ifdef NMF_USE_MODDING
         if (ModManagerBase::Instance != nullptr)
-            ModManagerBase::Instance->OnDebugImGuiDraw(ImGuiDrawTarget::General);
+            ModManagerBase::Instance->OnImGuiDraw(ImGuiDrawTarget::General);
 #endif
 
         for (const auto& console : Consoles)

@@ -28,7 +28,7 @@ namespace NMF
         virtual WndProcHandleResult WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) { return WndProcHandleResult::Continue; }
 
 #ifdef NMF_USE_IMGUI
-        virtual void OnDebugImGuiDraw(ImGuiDrawTarget target) {}
+        virtual void OnImGuiDraw(ImGuiDrawTarget target) {}
 #endif
 
         const char* GetName() const { return ModuleName; }
@@ -75,10 +75,10 @@ namespace NMF
         }
 
 #ifdef NMF_USE_IMGUI
-        virtual void OnDebugImGuiDraw(ImGuiDrawTarget target)
+        virtual void OnImGuiDraw(ImGuiDrawTarget target)
         {
             for (const auto& module : Modules)
-                module.second->OnDebugImGuiDraw(target);
+                module.second->OnImGuiDraw(target);
         }
 #endif
 
@@ -185,10 +185,10 @@ namespace NMF
         }
 
 #ifdef NMF_USE_IMGUI
-        virtual void OnDebugImGuiDraw(ImGuiDrawTarget target)
+        virtual void OnImGuiDraw(ImGuiDrawTarget target)
         {
             for (const auto& mod : Mods)
-                mod.second->OnDebugImGuiDraw(target);
+                mod.second->OnImGuiDraw(target);
         }
 #endif
 
