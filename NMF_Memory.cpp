@@ -21,7 +21,7 @@
 #if defined(NMF_STATIC_BASE)
 constexpr uint64_t StaticImageBase = NMF_STATIC_BASE;
 #elif defined(_WIN64)
-constexpr uint64_t StaticImageBase = 0x140000000ull; 
+constexpr uint64_t StaticImageBase = 0x140000000ull;
 #elif defined(_WIN32)
 constexpr uint64_t StaticImageBase = 0x400000ull;
 #else
@@ -257,9 +257,10 @@ namespace NMF
     Hook* MemoryManager::CreateHook(void* gameAddress, void* hookFunc)
     {
         uint64_t hookId = reinterpret_cast<uint64_t>(gameAddress);
+        uint64_t hookAddr = reinterpret_cast<uint64_t>(hookFunc);
 
 #ifdef NMF_USE_LOGGING
-        Logger.Log(LogSeverity::Debug, "Creating hook of 0x%lX, replacing with 0x%lX", hookId, hookFunc);
+        Logger.Log(LogSeverity::Debug, "Creating hook of 0x%lX, replacing with 0x%lX", hookId, hookAddr);
 #endif
 
         auto itr = Hooks.find(hookId);
