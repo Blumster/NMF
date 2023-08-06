@@ -126,7 +126,7 @@ namespace NMF
         const char* ModName;
 
 #ifdef NMF_USE_LOGGING
-        static Logger BaseLogger;
+        NMF_EXPORT static Logger BaseLogger;
 #endif
 
 #pragma warning(disable: 4251)
@@ -134,10 +134,10 @@ namespace NMF
 #pragma warning(default: 4251)
     };
 
-    class ModManagerBase
+    class NMF_EXPORT ModManagerBase
     {
     public:
-        NMF_EXPORT static ModManagerBase* Instance;
+        static ModManagerBase* Instance;
 
         ModManagerBase()
         {

@@ -31,6 +31,10 @@ namespace NMF
     HINSTANCE ImGuiManager::GameHINSTANCE{ nullptr };
     int ImGuiManager::GamenShowCmd{ 0 };
 
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+    bool ImGuiManager::IsControlCaught{ false };
+#endif
+
 #ifdef NMF_USE_LOGGING
     Logger ImGuiManager::Logger{ "ImGuiManager" };
 #endif
@@ -371,6 +375,14 @@ namespace NMF
             if (uMsg == WM_KEYDOWN && wParam == VK_F8)
                 ShowMenu(!IsMenuOpen);
 
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+            if (uMsg == WM_KEYDOWN && wParam == VK_F9)
+                SetCatchControl(!IsControlCaught);
+
+            if (!IsControlCaught)
+                return WndProcHandleResult::Continue;
+#endif
+
             if (!IsMenuOpen)
                 return WndProcHandleResult::Continue;
 
@@ -386,12 +398,33 @@ namespace NMF
     void ImGuiManager::ShowMenu(bool isShown)
     {
         IsMenuOpen = isShown;
+
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+        SetCatchControl(IsMenuOpen);
+#endif
     }
 
     bool ImGuiManager::IsMenuShown()
     {
         return IsMenuOpen;
     }
+
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+    void ImGuiManager::SetCatchControl(bool isCatching)
+    {
+        if (!IsMenuOpen && isCatching)
+            return;
+
+        IsControlCaught = isCatching;
+
+        External::SetGameFocus(!IsControlCaught);
+    }
+
+    bool ImGuiManager::IsCatchingControl()
+    {
+        return IsMenuOpen && IsControlCaught;
+    }
+#endif
 
 #ifdef NMF_IMGUI_POP_OUT
     LRESULT CALLBACK ImGuiManager::ExternalWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

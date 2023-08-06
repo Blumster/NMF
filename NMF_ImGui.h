@@ -88,6 +88,11 @@ namespace NMF
         static bool AddMessage(const char* id, const std::string& message);
         static bool AddMessage(const char* id, const std::string& message, const ImVec4& color);
 
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+        static void SetCatchControl(bool isCatching);
+        static bool IsCatchingControl();
+#endif
+
 #if defined(NMF_IMGUI_DX9)
         static void SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device);
 #elif defined(NMF_IMGUI_DX10)
@@ -110,6 +115,10 @@ namespace NMF
         static HWND GameHWND;
         static HINSTANCE GameHINSTANCE;
         static int GamenShowCmd;
+
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+        static bool IsControlCaught;
+#endif
 
 #pragma warning(disable: 4251)
         static std::map<std::string, ImGuiConsole*> Consoles;

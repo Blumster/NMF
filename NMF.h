@@ -51,13 +51,15 @@ namespace NMF
 
     WndProcHandleResult NMFWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    //NMF_EXPORT SDKError SetupSDK();
-    //NMF_EXPORT SDKError TeardownSDK();
-    //NMF_EXPORT GameTypes GetGameType();
-    //NMF_EXPORT bool HostIsGame();
-
     NMF_EXPORT void NMFRestoreImportTable();
     NMF_EXPORT void NMFExit(NMFExitCode exitCode);
+
+    namespace External
+    {
+#ifdef NMF_EXTERN_SET_GAME_FOCUS
+        extern void SetGameFocus(bool focus);
+#endif
+    }
 }
 
 #ifdef NMF_USE_LOGGING
