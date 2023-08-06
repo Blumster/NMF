@@ -141,23 +141,35 @@ namespace NMF
 
         ModManagerBase()
         {
-#ifdef NMF_USE_IMGUI
             if (Instance == nullptr)
                 Instance = this;
-#endif
         }
 
         virtual ~ModManagerBase() {}
 
         virtual bool RegisterMod(ModBase* mod)
         {
+#ifdef NMF_USE_LOGGING
+            Logger.Log(LogSeverity::Debug, "Registering mod: %s...", mod->GetName());
+#endif
+
             std::string modName(mod->GetName());
 
             auto itr = Mods.find(modName);
             if (itr != Mods.end())
+            {
+#ifdef NMF_USE_LOGGING
+                Logger.Log(LogSeverity::Error, "A mod under the name %s has already been registered! Skipping...", mod->GetName());
+#endif
+
                 return false;
+            }
 
             Mods[modName] = mod;
+
+#ifdef NMF_USE_LOGGING
+            Logger.Log(LogSeverity::Debug, "Mod: %s has been succesfully registered!", mod->GetName());
+#endif
 
             mod->OnAttach();
 
@@ -210,7 +222,11 @@ namespace NMF
         }
 #endif
 
-    protected:
+    private:
+#ifdef NMF_USE_LOGGING
+        static Logger Logger;
+#endif
+
 #pragma warning(disable: 4251)
         std::map<std::string, ModBase*> Mods;
 #pragma warning(default: 4251)
