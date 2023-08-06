@@ -88,6 +88,18 @@ namespace NMF
         static bool AddMessage(const char* id, const std::string& message);
         static bool AddMessage(const char* id, const std::string& message, const ImVec4& color);
 
+#if defined(NMF_IMGUI_DX9)
+        void SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device);
+#elif defined(NMF_IMGUI_DX10)
+#error "Not implemented yet!"
+#elif defined(NMF_IMGUI_DX11)
+#error "Not implemented yet!"
+#elif defined(NMF_IMGUI_DX12)
+#error "Not implemented yet!"
+#else
+#error "Invalid DX version!"
+#endif
+
     private:
         static void RecreateContext();
 
@@ -129,8 +141,6 @@ namespace NMF
 #if defined(NMF_IMGUI_DX9)
         static IDirect3DDevice9* GameDevice;
         static IDirect3D9* GameInstance;
-
-        void SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device);
 
 #ifdef NMF_IMGUI_POP_OUT
         static IDirect3DDevice9* ExternalDevice;
