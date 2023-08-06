@@ -210,6 +210,7 @@ namespace NMF
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
 
+#ifdef NMF_IMGUI_POP_OUT
         if (ExternalDevice != nullptr)
         {
 #if defined(NMF_IMGUI_DX9)
@@ -228,6 +229,7 @@ namespace NMF
         }
 
         UnregisterClass(ExternalWindowClassName, GameHINSTANCE);
+#endif
 
 #ifdef NMF_USE_LOGGING
         Logger.Log(LogSeverity::Debug, "ImGuiManager has been torn down!");
