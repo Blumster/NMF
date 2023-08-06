@@ -75,7 +75,7 @@ namespace NMF
     class NMF_EXPORT ImGuiManager final
     {
     public:
-        static void Setup(HINSTANCE hinstance, HWND hwnd, int nShowCmd);
+        static void Setup(HINSTANCE hinstance, int nShowCmd);
         static void Teardown();
         static void Render();
         static WndProcHandleResult WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -130,7 +130,7 @@ namespace NMF
         static IDirect3DDevice9* GameDevice;
         static IDirect3D9* GameInstance;
 
-        void SetupD3D(IDirect3D9* instance, IDirect3DDevice9* device);
+        void SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device);
 
 #ifdef NMF_IMGUI_POP_OUT
         static IDirect3DDevice9* ExternalDevice;

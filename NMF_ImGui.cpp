@@ -63,10 +63,9 @@ namespace NMF
 #error "Not implemented yet!"
 #endif
 
-    void ImGuiManager::Setup(HINSTANCE hinstance, HWND hwnd, int nShowCmd)
+    void ImGuiManager::Setup(HINSTANCE hinstance, int nShowCmd)
     {
         GameHINSTANCE = hinstance;
-        GameHWND = hwnd;
         GamenShowCmd = nShowCmd;
 
 #ifdef NMF_USE_LOGGING
@@ -112,8 +111,9 @@ namespace NMF
         return (*static_cast<void***>(obj))[index];
     }
 
-    void ImGuiManager::SetupD3D(IDirect3D9* instance, IDirect3DDevice9* device)
+    void ImGuiManager::SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device)
     {
+        GameHWND = gameHWND;
         GameInstance = instance;
         GameDevice = device;
 
