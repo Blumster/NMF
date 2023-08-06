@@ -13,6 +13,8 @@ namespace NMF
     ModManagerBase* ModManagerBase::Instance{ nullptr };
 
 #ifdef NMF_USE_LOGGING
+    Logger ModManagerBase::Logger{ "ModManagerBase" };
+
     Logger ModBase::Logger{ "ModBase" };
 #endif
 }
