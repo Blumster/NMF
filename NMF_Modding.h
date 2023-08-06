@@ -178,6 +178,12 @@ namespace NMF
             return WndProcHandleResult::Continue;
         }
 
+        void ForEach(std::function<void(ModBase*)> func)
+        {
+            for (const auto& mod : Mods)
+                func(mod.second);
+        }
+
 #ifdef NMF_USE_IMGUI
         virtual void OnDebugImGuiDraw(ImGuiDrawTarget target)
         {
