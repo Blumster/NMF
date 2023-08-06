@@ -89,7 +89,7 @@ namespace NMF
         static bool AddMessage(const char* id, const std::string& message, const ImVec4& color);
 
 #if defined(NMF_IMGUI_DX9)
-        void SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device);
+        static void SetupD3D(HWND gameHWND, IDirect3D9* instance, IDirect3DDevice9* device);
 #elif defined(NMF_IMGUI_DX10)
 #error "Not implemented yet!"
 #elif defined(NMF_IMGUI_DX11)
