@@ -260,14 +260,14 @@ namespace NMF
         uint64_t hookAddr = reinterpret_cast<uint64_t>(hookFunc);
 
 #ifdef NMF_USE_LOGGING
-        Logger.Log(LogSeverity::Debug, "Creating hook of 0x%lX, replacing with 0x%lX", hookId, hookAddr);
+        Logger.Log(LogSeverity::Debug, "Creating hook of 0x%llX, replacing with 0x%llX", hookId, hookAddr);
 #endif
 
         auto itr = Hooks.find(hookId);
         if (itr != Hooks.end())
         {
 #ifdef NMF_USE_LOGGING
-            Logger.Log(LogSeverity::Warning, "Hook of 0x%lX already exists! Skipping...", hookId);
+            Logger.Log(LogSeverity::Warning, "Hook of 0x%llX already exists! Skipping...", hookId);
 #endif
 
             return nullptr;
@@ -292,19 +292,21 @@ namespace NMF
     Patch* MemoryManager::CreatePatch(void* gameAddress, const void* data, size_t size)
     {
         uint64_t patchAddr = reinterpret_cast<uint64_t>(gameAddress);
+        uint64_t longSize = static_cast<uint64_t>(size);
 
 #ifdef NMF_USE_LOGGING
-        Logger.Log(LogSeverity::Debug, "Creating patch of size %lu at 0x%lX", size, patchAddr);
+        Logger.Log(LogSeverity::Debug, "Creating patch of size %llu at 0x%lX", longSize, patchAddr);
 #endif
 
         for (const auto& patch : Patches)
         {
             uint64_t currPatchAddr = reinterpret_cast<uint64_t>(patch->Address);
+            uint64_t longPatchSize = static_cast<uint64_t>(patch->Size);
 
             if (patchAddr + size > currPatchAddr && patchAddr < currPatchAddr + patch->Size)
             {
 #ifdef NMF_USE_LOGGING
-                Logger.Log(LogSeverity::Warning, "Patch at 0x%lX size %lu overlaps with patch at 0x%lX size %lu! Skipping...", patchAddr, size, currPatchAddr, patch->Size);
+                Logger.Log(LogSeverity::Warning, "Patch at 0x%llX size %llu overlaps with patch at 0x%llX size %llu! Skipping...", patchAddr, longSize, currPatchAddr, longPatchSize);
 #endif
 
                 return nullptr;
