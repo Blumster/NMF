@@ -87,16 +87,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)lib\detours\include;$(SolutionDir)lib\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\detours\include;$(ProjectDir)lib\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)lib\detours\include;$(SolutionDir)lib\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\detours\include;$(ProjectDir)lib\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)lib\detours\include;$(SolutionDir)lib\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\detours\include;$(ProjectDir)lib\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)lib\detours\include;$(SolutionDir)lib\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\detours\include;$(ProjectDir)lib\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
