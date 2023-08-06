@@ -186,7 +186,7 @@ namespace NMF
         }
 #endif
 
-    private:
+    protected:
 #pragma warning(disable: 4251)
         static std::map<std::string, ModBase*> Mods;
 #pragma warning(default: 4251)
