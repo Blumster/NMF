@@ -86,13 +86,27 @@ namespace NMF
 
         virtual bool RegisterModule(ModuleBase* module)
         {
+#ifdef NMF_USE_LOGGING
+            Logger.Log(LogSeverity::Debug, "Registering module: %s in mod: %s!", module->GetName(), GetName());
+#endif
+
             std::string moduleName(module->GetName());
 
             auto itr = Modules.find(moduleName);
             if (itr != Modules.end())
+            {
+#ifdef NMF_USE_LOGGING
+                Logger.Log(LogSeverity::Error, "A module under the name %s has already been registered! Skipping...", module->GetName());
+#endif
+
                 return false;
+            }
 
             Modules[moduleName] = module;
+
+#ifdef NMF_USE_LOGGING
+            Logger.Log(LogSeverity::Debug, "Module: %s in mod: %s has been successfully registered!", module->GetName(), GetName());
+#endif
 
             return true;
         }
@@ -110,6 +124,10 @@ namespace NMF
 
     private:
         const char* ModName;
+
+#ifdef NMF_USE_LOGGING
+        static Logger Logger;
+#endif
 
 #pragma warning(disable: 4251)
         std::map<std::string, ModuleBase*> Modules;
