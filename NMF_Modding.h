@@ -122,6 +122,12 @@ namespace NMF
             return nullptr;
         }
 
+        void ForEach(std::function<void(ModuleBase*)> func)
+        {
+            for (const auto& module : Modules)
+                func(module.second);
+        }
+
     private:
         const char* ModName;
 
