@@ -14,7 +14,7 @@ namespace NMF
 {
     class ModBase;
 
-    class ModuleBase
+    class NMF_EXTENDED_EXPORT ModuleBase
     {
     public:
         ModuleBase(ModBase* owner, const char* moduleName)
@@ -39,7 +39,7 @@ namespace NMF
         const char* ModuleName;
     };
 
-    class ModBase
+    class NMF_EXTENDED_EXPORT ModBase
     {
     public:
         ModBase(const char* modName)
