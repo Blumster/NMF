@@ -14,7 +14,7 @@ namespace NMF
 {
     class ModBase;
 
-    class NMF_EXTENDED_EXPORT ModuleBase
+    class NMF_EXPORT ModuleBase
     {
     public:
         ModuleBase(ModBase* owner, const char* moduleName)
@@ -39,7 +39,7 @@ namespace NMF
         const char* ModuleName;
     };
 
-    class NMF_EXTENDED_EXPORT ModBase
+    class NMF_EXPORT ModBase
     {
     public:
         ModBase(const char* modName)
@@ -132,7 +132,7 @@ namespace NMF
         const char* ModName;
 
 #ifdef NMF_USE_LOGGING
-        NMF_EXPORT static Logger BaseLogger;
+        static Logger BaseLogger;
 #endif
 
 #pragma warning(disable: 4251)
