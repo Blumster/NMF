@@ -42,10 +42,11 @@ namespace NMF
         {
             MODULEINFO moduleInfo = { 0 };
 
-            HMODULE hModule = GetModuleHandleW(NULL);
-            if (hModule == 0)
+            HMODULE hModule = GetModuleHandle(NULL);
+            if (hModule == NULL)
             {
-                exit(1);
+                // Creating fake values, so the app can run, but will crash if any game pointer is dereferenced
+                ImageSize = 0xFFFFFFFFui64;
 
                 return 0x0ull;
             }
@@ -70,11 +71,7 @@ namespace NMF
     void* operator"" _addr(uint64_t address)
     {
         if (address < StaticImageBase || address >= StaticImageBase + GetImageSize())
-        {
-            exit(1);
-
             return nullptr;
-        }
 
         return reinterpret_cast<void*>(reinterpret_cast<uint8_t*>(GetImageBase()) + (address - StaticImageBase));
     }
@@ -82,11 +79,7 @@ namespace NMF
     void* operator"" _rva(uint64_t address)
     {
         if (address >= GetImageSize())
-        {
-            exit(1);
-
             return nullptr;
-        }
 
         return reinterpret_cast<void*>(reinterpret_cast<uint8_t*>(GetImageBase()) + address);
     }
