@@ -30,6 +30,9 @@
     type& operator=(const type&) = delete; \
     type& operator=(type&&) = delete;
 
+#define ASSERT_CLASS_SIZE(class, size) static_assert(sizeof(class) == size, "Size of " #class " doesn't match expected size " #size "!")
+#define ASSERT_CLASS_MEMBER_OFFSET(class, member, offset) static_assert(offsetof(class, member) == offset, "Offset of " #member " in class " #class " doesn't match expected offset " #offset "!")
+
 namespace NMF
 {
     enum class NMFExitCode : int32_t
