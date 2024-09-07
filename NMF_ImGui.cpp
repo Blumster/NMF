@@ -12,7 +12,7 @@
 #error "Not implemented yet!"
 #elif defined(NMF_IMGUI_DX11)
 #include "lib/imgui/backends/imgui_impl_dx11.h"
-#error "Not implemented yet!"
+#include <d3d11.h>
 #elif defined(NMF_IMGUI_DX12)
 #include "lib/imgui/backends/imgui_impl_dx12.h"
 #error "Not implemented yet!"
@@ -63,6 +63,13 @@ namespace NMF
     Hook* ImGuiManager::DeviceEndSceneHook{ nullptr };
     Hook* ImGuiManager::DeviceResetHook{ nullptr };
 #endif
+#elif defined(NMF_IMGUI_DX11)
+    ID3D11Device* ImGuiManager::GameDevice{ nullptr };
+    ID3D11DeviceContext* ImGuiManager::GameDeviceContext{ nullptr };
+
+#ifdef NMF_IMGUI_POP_OUT
+    ID3D11Device* ImGuiManager::ExternalDevice{ nullptr };
+#endif
 #else
 #error "Not implemented yet!"
 #endif
@@ -111,6 +118,42 @@ namespace NMF
         return;
     }
 
+    void ImGuiManager::EndScene()
+    {
+#ifdef NMF_IMGUI_POP_OUT
+        if (IsExternalWindow)
+        {
+#if defined(NMF_IMGUI_DX9)
+            IDirect3DDevice9_Clear(ExternalDevice, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_RGBA(0, 0, 0, 255), 0, 0);
+            IDirect3DDevice9_BeginScene(ExternalDevice);
+#else
+#error "Not implemented yet!"
+#endif
+
+            Render();
+
+#if defined(NMF_IMGUI_DX9)
+#ifdef NMF_IMGUI_DX9_HOOK_VIRTUAL
+            DeviceEndSceneHook->GetOriginalFunction<D3DeviceEndSceneFunction*>()(ExternalDevice);
+#else
+            IDirect3DDevice9_EndScene(ExternalDevice);
+#endif
+
+            IDirect3DDevice9_Present(ExternalDevice, NULL, NULL, NULL, NULL);
+#else
+#error "Not implemented yet!"
+#endif
+
+            RedrawWindow(ExternalHWND, NULL, NULL, RDW_INTERNALPAINT);
+
+            return;
+        }
+#endif
+
+        if (IsMenuOpen)
+            Render();
+    }
+
 #if defined(NMF_IMGUI_DX9)
     void* GetVirtualFunction(void* obj, int index)
     {
@@ -148,34 +191,6 @@ namespace NMF
 #endif
     }
 
-    void ImGuiManager::EndScene()
-    {
-#ifdef NMF_IMGUI_POP_OUT
-        if (IsExternalWindow)
-        {
-            IDirect3DDevice9_Clear(ExternalDevice, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_RGBA(0, 0, 0, 255), 0, 0);
-            IDirect3DDevice9_BeginScene(ExternalDevice);
-
-            Render();
-
-#ifdef NMF_IMGUI_DX9_HOOK_VIRTUAL
-            DeviceEndSceneHook->GetOriginalFunction<D3DeviceEndSceneFunction*>()(ExternalDevice);
-#else
-            IDirect3DDevice9_EndScene(ExternalDevice);
-#endif
-
-            IDirect3DDevice9_Present(ExternalDevice, NULL, NULL, NULL, NULL);
-
-            RedrawWindow(ExternalHWND, NULL, NULL, RDW_INTERNALPAINT);
-
-            return;
-        }
-#endif
-
-        if (IsMenuOpen)
-            Render();
-    }
-
 #ifdef NMF_IMGUI_DX9_HOOK_VIRTUAL
     HRESULT __stdcall ImGuiManager::DX9EndScene(void* device)
     {
@@ -197,6 +212,39 @@ namespace NMF
         return result;
     }
 #endif
+
+#elif defined(NMF_IMGUI_DX11)
+    void ImGuiManager::SetupD3D(HWND gameHWND, ID3D11Device* device, ID3D11DeviceContext* context)
+    {
+        GameHWND = gameHWND;
+        GameDevice = device;
+        GameDeviceContext = context;
+
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplWin32_Init(GameHWND);
+        ImGui_ImplDX11_Init(GameDevice, GameDeviceContext);
+
+#ifdef NMF_IMGUI_DX11_HOOK_VIRTUAL
+#error "Not implemented yet!"
+        DeviceEndSceneHook = MemoryManager::CreateAndApplyHook(GetVirtualFunction(device, 42), &ImGuiManager::DX9EndScene);
+        DeviceResetHook = MemoryManager::CreateAndApplyHook(GetVirtualFunction(device, 16), &ImGuiManager::DX9Reset);
+
+        if (DeviceEndSceneHook == nullptr || DeviceResetHook == nullptr)
+        {
+#ifdef NMF_USE_LOGGING
+            Logger.Log(LogSeverity::Error, "ImGuiManager: unable to hook EndScene/Reset! Exiting...");
+#endif
+
+            NMFExit(NMFExitCode::ImGuiManagerDeviceHooks);
+        }
+#endif
+
+#ifdef NMF_USE_LOGGING
+        Logger.Log(LogSeverity::Debug, "ImGuiManager has been set up!");
+#endif
+    }
 #else
 #error "Not implemented yet!"
 #endif
@@ -209,6 +257,8 @@ namespace NMF
 
 #if defined(NMF_IMGUI_DX9)
         ImGui_ImplDX9_Shutdown();
+#elif defined(NMF_IMGUI_DX11)
+        ImGui_ImplDX11_Shutdown();
 #else
 #error "Not implemented yet!"
 #endif
@@ -246,6 +296,8 @@ namespace NMF
     {
 #if defined(NMF_IMGUI_DX9)
         ImGui_ImplDX9_Shutdown();
+#elif defined(NMF_IMGUI_DX11)
+        ImGui_ImplDX11_Shutdown();
 #else
 #error "Not implemented yet!"
 #endif
@@ -273,6 +325,8 @@ namespace NMF
 
 #if defined(NMF_IMGUI_DX9)
             ImGui_ImplDX9_Init(GameDevice);
+#elif defined(NMF_IMGUI_DX11)
+            ImGui_ImplDX11_Init(GameDevice, GameDeviceContext);
 #else
 #error "Not implemented yet!"
 #endif
@@ -283,6 +337,8 @@ namespace NMF
     {
 #if defined(NMF_IMGUI_DX9)
         ImGui_ImplDX9_NewFrame();
+#elif defined(NMF_IMGUI_DX11)
+        ImGui_ImplDX11_NewFrame();
 #else
 #error "Not implemented yet!"
 #endif
@@ -361,6 +417,8 @@ namespace NMF
 
 #if defined(NMF_IMGUI_DX9)
         ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+#elif defined(NMF_IMGUI_DX11)
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #else
 #error "Not implemented yet!"
 #endif

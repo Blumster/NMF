@@ -21,7 +21,8 @@ struct IDirect3DDevice9;
 #elif defined(NMF_IMGUI_DX10)
 #error "Not implemented yet!"
 #elif defined(NMF_IMGUI_DX11)
-#error "Not implemented yet!"
+struct ID3D11Device;
+struct ID3D11DeviceContext;
 #elif defined(NMF_IMGUI_DX12)
 #error "Not implemented yet!"
 #else
@@ -98,7 +99,7 @@ namespace NMF
 #elif defined(NMF_IMGUI_DX10)
 #error "Not implemented yet!"
 #elif defined(NMF_IMGUI_DX11)
-#error "Not implemented yet!"
+        static void SetupD3D(HWND gameHWND, ID3D11Device* device, ID3D11DeviceContext* context);
 #elif defined(NMF_IMGUI_DX12)
 #error "Not implemented yet!"
 #else
@@ -161,6 +162,13 @@ namespace NMF
 
         static HRESULT __stdcall DX9EndScene(void* device);
         static HRESULT __stdcall DX9Reset(void* device, void* pParam);
+#endif
+#elif defined(NMF_IMGUI_DX11)
+        static ID3D11Device* GameDevice;
+        static ID3D11DeviceContext* GameDeviceContext;
+
+#ifdef NMF_IMGUI_POP_OUT
+        static ID3D11Device* ExternalDevice;
 #endif
 #else
         static void* ExternalDevice;
